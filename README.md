@@ -1,49 +1,61 @@
-# WRDD — Windows Rubbish Data Deletor
+# Win-Cleaner-Service 🧹
+**Automated Windows Service for Comprehensive System Junk Cleanup**
 
-My first Windows Service — built in C# .NET Framework. It silently cleans temp files, browser caches, crash dumps, and app junk from your PC every week without any manual effort.
+## Overview
+Win-Cleaner-Service is a robust Windows Service developed in C# (.NET) that proactively eliminates temporary files, browser caches, and accumulated system junk. Designed for operational environments where reliability and automation are essential, it optimizes disk usage and preserves system performance with zero user interaction. The service is scheduled for weekly execution via Task Scheduler, ensuring regular maintenance without manual oversight.
 
----
+## Features ✨
+- **Automated, Unattended Cleaning:** Runs as a Windows Service, operating in the background without user intervention.
+- **Broad Junk File Coverage:** Targets temporary files, browser caches, and general system clutter.
+- **Scheduled Execution:** Integrates with Windows Task Scheduler for reliable, periodic operation. ⏰
+- **Low Resource Footprint:** Engineered for minimal memory and CPU usage, suitable for continuous production deployment.
+- **Extensible Design:** Modular codebase allows straightforward adaptation to new file types or cleanup routines.
 
-## What It Cleans
+## Tech Stack ⚙️
+- **Language:** C# (.NET)
+- **Platform:** Windows Service
+- **Task Orchestration:** Windows Task Scheduler
 
-- Windows Temp, Minidump, and Crash Dumps
-- Windows Error Reporting (WER) queues and archives
-- Browser caches — Chrome, Edge, Brave
-- App caches — Discord, Spotify, Slack, Zoom
+## Architecture & Design Decisions 🏗️
+- **Service-Based Model:** Implements as a system Windows Service for deep integration and background operation, supporting secure and continuous task execution even when no user is logged in.
+- **Separation of Concerns:** Cleanup logic is isolated from scheduling and service orchestration, improving maintainability and testability.
+- **Fail-Safe Cleanup:** Defensive error handling ensures that cleanup is resilient to file locks, permissions, and edge cases without service crashes.
+- **Silent Operation:** No UI dependencies; all operations are logged or handled in the background to avoid user disruption.
+- **Configurable Scheduling:** Leverages Windows-native Task Scheduler to decouple time-based triggers from service lifecycles, allowing flexible deployment.
 
-Minidump files older than 30 days are removed. Everything else older than 48 hours is removed.
+## How It Works (High-Level Flow) 🔄
+1. **Service Initialization:** On machine boot, the service starts automatically with system privileges.
+2. **Trigger:** Task Scheduler invokes the cleanup routine on a weekly cadence, or as configured.
+3. **Cleanup Execution:** The service scans known temp directories, browser cache locations, and defined junk paths, methodically deleting eligible files.
+4. **Error Handling:** Logs and gracefully skips protected or in-use files to avoid system conflicts.
+5. **Completion:** Detailed logs are optionally maintained for audits or diagnostics.
 
----
+## Setup & Installation 🛠️
+> **Prerequisites:** .NET runtime installation and administrator privileges.
 
-## Installation
+1. **Build and Install:**  
+   - Build the solution in Release mode.
+   - Register the Windows Service using `sc create` or `InstallUtil.exe` (see `docs/` for scripts if included).
 
-Open a Developer Command Prompt as Administrator and run:
+2. **Schedule via Task Scheduler:**  
+   - Import or create a scheduled task to invoke the service's cleanup executable on your preferred schedule (default: weekly).
 
+3. **Verify Operation:**  
+   - Check Windows Services Manager for the running `Win-Cleaner-Service`.
+   - Optionally, review logs in the service’s log directory.
+
+## Usage Example 🚀
+The service is intended to be background and zero-touch. To trigger ad hoc cleanup:
+```powershell
+net start Win-Cleaner-Service
 ```
-InstallUtil.exe "C:\Path\To\winRubish_TempDataServiceWeeklyDeletor.exe"
-```
+or use Task Scheduler to run the configured cleanup task on demand.
 
-The service appears in `services.msc` with startup type set to Manual — use Task Scheduler to automate it.
-
----
-
-## Automating With Task Scheduler
-
-1. Open Task Scheduler → `Create Task`
-2. **General** — check `Run with highest privileges`
-3. **Triggers** — Weekly, pick your day and time
-4. **Actions** — Start a program: `sc` with argument `start WRDD`
-5. Click OK — done
+## Future Improvements 📈
+- Optional notification integration (Email/Windows Event Log) for summary reports.
+- Custom path inclusion/exclusion rules via an external config file.
+- GUI dashboard for service health and cleanup statistics.
 
 ---
 
-## Built With
-
-- C# .NET Framework · Windows Services · InstallUtil · Task Scheduler · ConfigurationManager
-
----
-
-## Author
-
-Tony — self-taught C# developer building real-world Windows desktop and service projects.
-
+Serious about efficiency and system hygiene, `Win-Cleaner-Service` prioritizes maintainable code, automation, and operational reliability—ideally suited for both managed enterprise environments and personal power users.
